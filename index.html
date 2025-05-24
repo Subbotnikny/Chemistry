@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Викторина: Ряд активности металлов</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .quiz-intro {
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .question {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #ffd700;
+        }
+
+        .question h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background-color: rgba(0, 123, 255, 0.5);
+            border-left: 5px solid #007bff;
+        }
+
+        .option.correct {
+            background-color: rgba(40, 167, 69, 0.5);
+            border-left: 5px solid #28a745;
+        }
+
+        .option.incorrect {
+            background-color: rgba(220, 53, 69, 0.5);
+            border-left: 5px solid #dc3545;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            min-width: 200px;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #218838);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.2em;
+            display: none;
+        }
+
+        .score {
+            font-size: 1.5em;
+            color: #ffd700;
+            margin: 20px 0;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            height: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .metal-series {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .metal {
+            background-color: rgba(255, 215, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .explanation {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .btn {
+                min-width: 150px;
+                padding: 10px 15px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Викторина: Ряд активности металлов</h1>
+        
+        <div class="quiz-intro">
+            <p>Проверьте свои знания о ряде активности металлов! Вам будут предложены 20 вопросов о химических свойствах металлов и их реакционной способности.</p>
+            <div class="metal-series">
+                <span class="metal">Li</span>
+                <span class="metal">K</span>
+                <span class="metal">Ba</span>
+                <span class="metal">Ca</span>
+                <span class="metal">Na</span>
+                <span class="metal">Mg</span>
+                <span class="metal">Al</span>
+                <span class="metal">Zn</span>
+                <span class="metal">Fe</span>
+                <span class="metal">Ni</span>
+                <span class="metal">Sn</span>
+                <span class="metal">Pb</span>
+                <span class="metal">Cu</span>
+                <span class="metal">Hg</span>
+                <span class="metal">Ag</span>
+                <span class="metal">Au</span>
+                <span class="metal">Pt</span>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+        
+        <div id="quiz-container">
+            <!-- Вопросы будут загружаться здесь -->
+        </div>
+        
+        <div class="btn-group" id="button-group">
+            <button class="btn" id="submit">Проверить ответ</button>
+            <button class="btn btn-secondary" id="next" style="display: none;">Следующий вопрос</button>
+            <button class="btn btn-success" id="hint" style="display: none;">Подсказка</button>
+        </div>
+        
+        <div class="result" id="result">
+            <h2>Ваш результат:</h2>
+            <div class="score" id="score"></div>
+            <p id="result-text"></p>
+            <div class="btn-group">
+                <button class="btn" id="restart">Пройти заново</button>
+                <button class="btn btn-secondary" id="review">Просмотреть ответы</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Какой металл находится в самом начале ряда активности?",
+                options: ["Золото (Au)", "Литий (Li)", "Железо (Fe)", "Медь (Cu)"],
+                answer: 1,
+                explanation: "Литий (Li) находится в начале ряда активности металлов, что означает, что он является одним из самых активных металлов."
+            },
+            {
+                question: "Какой металл находится в самом конце ряда активности?",
+                options: ["Натрий (Na)", "Цинк (Zn)", "Золото (Au)", "Алюминий (Al)"],
+                answer: 2,
+                explanation: "Золото (Au) находится в конце ряда активности, что означает, что оно является одним из самых неактивных металлов."
+            },
+            {
+                question: "Какой металл бурно реагирует с водой, выделяя водород?",
+                options: ["Железо (Fe)", "Натрий (Na)", "Медь (Cu)", "Золото (Au)"],
+                answer: 1,
+                explanation: "Натрий (Na) бурно реагирует с водой, так как он очень активный металл."
+            },
+            {
+                question: "Какой металл используют для защиты железа от ржавчины?",
+                options: ["Золото (Au)", "Цинк (Zn)", "Медь (Cu)", "Серебро (Ag)"],
+                answer: 1,
+                explanation: "Цинк (Zn) используют для защиты железа от ржавчины, так как он более активен и корродирует первым."
+            },
+            {
+                question: "Какой металл не реагирует с водой даже при нагревании?",
+                options: ["Калий (K)", "Натрий (Na)", "Медь (Cu)", "Кальций (Ca)"],
+                answer: 2,
+                explanation: "Медь (Cu) не реагирует с водой, так как она находится в конце ряда активности."
+            },
+            {
+                question: "Какой металл может вытеснить железо из раствора его соли?",
+                options: ["Медь (Cu)", "Цинк (Zn)", "Серебро (Ag)", "Золото (Au)"],
+                answer: 1,
+                explanation: "Цинк (Zn) может вытеснить железо из раствора его соли, так как он более активен."
+            },
+            {
+                question: "Какой металл не может вытеснить водород из кислоты?",
+                options: ["Железо (Fe)", "Цинк (Zn)", "Медь (Cu)", "Алюминий (Al)"],
+                answer: 2,
+                explanation: "Медь (Cu) не может вытеснить водород из кислоты, так как в ряду активности она находится после водорода."
+            },
+            {
+                question: "Какой металл находится между алюминием и железом в ряду активности?",
+                options: ["Медь (Cu)", "Цинк (Zn)", "Серебро (Ag)", "Золото (Au)"],
+                answer: 1,
+                explanation: "Цинк (Zn) находится между алюминием (Al) и железом (Fe) в ряду активности металлов."
+            },
+            {
+                question: "Какой металл называют 'летучим' из-за его способности испаряться при комнатной температуре?",
+                options: ["Ртуть (Hg)", "Натрий (Na)", "Алюминий (Al)", "Золото (Au)"],
+                answer: 0,
+                explanation: "Ртуть (Hg) - единственный металл, который при комнатной температуре находится в жидком состоянии и легко испаряется."
+            },
+            {
+                question: "Какой металл используют в термометрах?",
+                options: ["Ртуть (Hg)", "Серебро (Ag)", "Алюминий (Al)", "Олово (Sn)"],
+                answer: 0,
+                explanation: "Ртуть (Hg) используют в термометрах благодаря ее свойству равномерно расширяться при нагревании."
+            },
+            {
+                question: "Какой металл образует амфотерный гидроксид?",
+                options: ["Натрий (Na)", "Кальций (Ca)", "Алюминий (Al)", "Серебро (Ag)"],
+                answer: 2,
+                explanation: "Алюминий (Al) образует амфотерный гидроксид Al(OH)₃, который может реагировать как с кислотами, так и со щелочами."
+            },
+            {
+                question: "Какой металл не образует оксидную пленку на воздухе?",
+                options: ["Алюминий (Al)", "Цинк (Zn)", "Золото (Au)", "Хром (Cr)"],
+                answer: 2,
+                explanation: "Золото (Au) не образует оксидную пленку на воздухе, так как практически не окисляется в обычных условиях."
+            },
+            {
+                question: "Какой металл используют для изготовления электрических проводов?",
+                options: ["Железо (Fe)", "Алюминий (Al)", "Медь (Cu)", "Цинк (Zn)"],
+                answer: 2,
+                explanation: "Медь (Cu) используют для изготовления электрических проводов благодаря ее высокой электропроводности."
+            },
+            {
+                question: "Какой металл используют для изготовления фольги?",
+                options: ["Железо (Fe)", "Алюминий (Al)", "Медь (Cu)", "Цинк (Zn)"],
+                answer: 1,
+                explanation: "Алюминий (Al) используют для изготовления фольги благодаря его пластичности и устойчивости к коррозии."
+            },
+            {
+                question: "Какой металл используют для изготовления монет?",
+                options: ["Натрий (Na)", "Калий (K)", "Медь (Cu)", "Ртуть (Hg)"],
+                answer: 2,
+                explanation: "Медь (Cu) используют для изготовления монет благодаря ее устойчивости к коррозии и красивому внешнему виду."
+            },
+            {
+                question: "Какой металл используют для изготовления ювелирных изделий?",
+                options: ["Железо (Fe)", "Алюминий (Al)", "Золото (Au)", "Цинк (Zn)"],
+                answer: 2,
+                explanation: "Золото (Au) используют для изготовления ювелирных изделий благодаря его красивому внешнему виду и устойчивости к коррозии."
+            },
+            {
+                question: "Какой металл используют для изготовления батареек?",
+                options: ["Золото (Au)", "Серебро (Ag)", "Цинк (Zn)", "Медь (Cu)"],
+                answer: 2,
+                explanation: "Цинк (Zn) используют для изготовления батареек благодаря его способности к окислению и восстановлению."
+            },
+            {
+                question: "Какой металл используют для изготовления посуды?",
+                options: ["Натрий (Na)", "Калий (K)", "Алюминий (Al)", "Ртуть (Hg)"],
+                answer: 2,
+                explanation: "Алюминий (Al) используют для изготовления посуды благодаря его легкости, теплопроводности и устойчивости к коррозии."
+            },
+            {
+                question: "Какой металл используют для изготовления автомобильных кузовов?",
+                options: ["Золото (Au)", "Серебро (Ag)", "Железо (Fe)", "Медь (Cu)"],
+                answer: 2,
+                explanation: "Железо (Fe) используют для изготовления автомобильных кузовов благодаря его прочности и доступности."
+            },
+            {
+                question: "Какой металл используют для изготовления электрических лампочек?",
+                options: ["Железо (Fe)", "Алюминий (Al)", "Вольфрам (W)", "Цинк (Zn)"],
+                answer: 2,
+                explanation: "Вольфрам (W) используют для изготовления нитей накаливания в электрических лампочках благодаря его высокой температуре плавления."
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+        const submitBtn = document.getElementById('submit');
+        const nextBtn = document.getElementById('next');
+        const hintBtn = document.getElementById('hint');
+        const restartBtn = document.getElementById('restart');
+        const reviewBtn = document.getElementById('review');
+        const resultContainer = document.getElementById('result');
+        const scoreElement = document.getElementById('score');
+        const resultText = document.getElementById('result-text');
+        const progressBar = document.getElementById('progress');
+        const buttonGroup = document.getElementById('button-group');
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedOption = null;
+        let quizCompleted = false;
+        let userAnswers = [];
+
+        function loadQuestion() {
+            if (currentQuestion >= questions.length) {
+                showResult();
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            quizContainer.innerHTML = `
+                <div class="question">
+                    <h3>Вопрос ${currentQuestion + 1}/${questions.length}: ${question.question}</h3>
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <div class="option" data-index="${index}">
+                                <span>${String.fromCharCode(65 + index)}.</span> ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="explanation" id="explanation"></div>
+                </div>
+            `;
+
+            progressBar.style.width = `${((currentQuestion) / questions.length) * 100}%`;
+
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', function() {
+                    if (quizCompleted) return;
+                    
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    this.classList.add('selected');
+                    selectedOption = parseInt(this.getAttribute('data-index'));
+                });
+            });
+
+            submitBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+            hintBtn.style.display = 'none';
+            selectedOption = null;
+        }
+
+        function checkAnswer() {
+            if (selectedOption === null) {
+                alert('Пожалуйста, выберите вариант ответа!');
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            const explanation = document.getElementById('explanation');
+
+            options.forEach(option => {
+                option.style.cursor = 'default';
+            });
+
+            options.forEach((option, index) => {
+                if (index === question.answer) {
+                    option.classList.add('correct');
+                } else if (index === selectedOption && index !== question.answer) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            explanation.style.display = 'block';
+            explanation.innerHTML = `<strong>Объяснение:</strong> ${question.explanation}`;
+
+            if (selectedOption === question.answer) {
+                score++;
+            }
+
+            userAnswers.push({
+                question: question.question,
+                userAnswer: question.options[selectedOption],
+                correctAnswer: question.options[question.answer],
+                isCorrect: selectedOption === question.answer,
+                explanation: question.explanation
+            });
+
+            submitBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
+            hintBtn.style.display = 'none';
+        }
+
+        function showHint() {
+            const question = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            const correctIndex = question.answer;
+            
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.style.backgroundColor = 'rgba(40, 167, 69, 0.3)';
+                    option.style.borderLeft = '3px solid #28a745';
+                }
+            });
+            
+            hintBtn.style.display = 'none';
+        }
+
+        function showResult() {
+            quizContainer.style.display = 'none';
+            buttonGroup.style.display = 'none';
+            resultContainer.style.display = 'block';
+            
+            progressBar.style.width = '100%';
+
+            const percentage = Math.round((score / questions.length) * 100);
+            scoreElement.textContent = `${score} из ${questions.length} (${percentage}%)`;
+            
+            if (percentage >= 90) {
+                resultText.textContent = 'Превосходно! Вы настоящий эксперт в ряду активности металлов!';
+            } else if (percentage >= 70) {
+                resultText.textContent = 'Очень хорошо! Вы хорошо разбираетесь в химии металлов.';
+            } else if (percentage >= 50) {
+                resultText.textContent = 'Хороший результат! Повторите материал для улучшения знаний.';
+            } else {
+                resultText.textContent = 'Попробуйте еще раз! Рекомендуем изучить ряд активности металлов.';
+            }
+            
+            quizCompleted = true;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            quizCompleted = false;
+            userAnswers = [];
+            quizContainer.style.display = 'block';
+            buttonGroup.style.display = 'flex';
+            resultContainer.style.display = 'none';
+            loadQuestion();
+        }
+
+        function reviewAnswers() {
+            let reviewHTML = '<div class="question"><h3>Просмотр ответов:</h3>';
+            
+            userAnswers.forEach((item, index) => {
+                reviewHTML += `
+                    <div style="margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px;">
+                        <p><strong>Вопрос ${index + 1}:</strong> ${item.question}</p>
+                        <p style="color: ${item.isCorrect ? '#28a745' : '#dc3545'}">
+                            Ваш ответ: ${item.userAnswer} ${item.isCorrect ? '✓' : '✗'}
+                        </p>
+                        <p>Правильный ответ: ${item.correctAnswer}</p>
+                        <div class="explanation" style="display: block;">
+                            <strong>Объяснение:</strong> ${item.explanation}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            reviewHTML += '</div>';
+            quizContainer.innerHTML = reviewHTML;
+            quizContainer.style.display = 'block';
+            resultContainer.style.display = 'none';
+            buttonGroup.style.display = 'none';
+            
+            const backBtn = document.createElement('button');
+            backBtn.className = 'btn';
+            backBtn.textContent = 'Назад к результатам';
+            backBtn.style.margin = '20px auto';
+            backBtn.style.display = 'block';
+            backBtn.onclick = () => {
+                quizContainer.style.display = 'none';
+                resultContainer.style.display = 'block';
+            };
+            
+            quizContainer.appendChild(backBtn);
+        }
+
+        submitBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', () => {
+            currentQuestion++;
+            loadQuestion();
+        });
+        hintBtn.addEventListener('click', showHint);
+        restartBtn.addEventListener('click', restartQuiz);
+        reviewBtn.addEventListener('click', reviewAnswers);
+
+        loadQuestion();
+    </script>
+</body>
+</html>
